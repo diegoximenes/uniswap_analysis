@@ -18,7 +18,7 @@
 
 A brief guide on some Uniswap protocol concepts.
 This article was written so I can revisit these concepts in the future, since Uniswap V3 whitepaper is not so explicit and didactic.
-However I realized it can also be useful to other people.
+However I realized it can also be useful to others.
 It includes some approaches and opinions that were not found in the current literature.
 Target audience are people who have some familiarity on how Uniswap operates, at least on an user (liquidity provider and trader) level.
 
@@ -28,8 +28,8 @@ In a Constant Product Market Maker, such as implemented by Uniswap V2, there are
 
 Traders are interested to exchange a certain amount of a token for a certain amount of another token, and for that they generally pay a fee to use a service, a market maker, that enables that operation.
 
-Liquidity providers are the ones who previouly provide tokens to the market maker, to then be used by the traders to execute their exchanges.
-In general fees gathered from traders are distributed to the liquidity providers, which are then incentivized to provide their tokens to the market maker.
+Liquidity providers are the ones who previouly provide tokens to the market maker, to then be used by traders to execute their exchanges.
+In general, fees gathered from traders are distributed to liquidity providers, which are then incentivized to provide their tokens to the market maker.
 
 Also, Uniswap defines the concept of a pool, which is a Constant Product Market Maker specific for a pair of tokens, e.g., USDC/DAI, in which liquidity providers and traders operate with only this pair of tokens.
 
@@ -53,7 +53,7 @@ This invariance means that, if a trader wants to get a certain amount $\Delta_x$
     \label{equation:constant_product_2}
     \begin{split}
         (x - \Delta_x)(y + \Delta_y)=xy \\
-        \Rightarrow \Delta_y=\frac{y\Delta_x}{x + \Delta_x}
+        \Rightarrow \Delta_y=\frac{y\Delta_x}{x - \Delta_x}
     \end{split}
 \end{equation}
 
@@ -73,7 +73,7 @@ Substituting equation \ref{equation:constant_product_2} in \ref{equation:price_x
 
 \begin{equation}
     \label{equation:price_x_2}
-    p^x=\frac{y}{x+\Delta_x}
+    p^x=\frac{y}{x-\Delta_x}
 \end{equation}
 
 Which can be read as the unit price of $token_x$ payed in $token_y$ in this trade.
@@ -147,9 +147,9 @@ Using Figure \ref{figure:uniswap_v3} as an example, given a price range defined 
 
 That distinction between virtual and real amounts enables Uniswap V3 to represent prices in a bounded price range $[p_a, p_b]$ with the same precision as Uniswap v2, however using less liquidity for this.
 Again using Figure \ref{figure:uniswap_v3} as an example, in Uniswap V2, to represent the price in the point $C$, it would be necessary to have at least $x_c$ $tokens_x$ and at least $y_c$ $tokens_y$ available in the pool.
-However, in Uniswap V3, if a liquidity provider decides to provide liquidy only in the price range $[p_a, p_b]$, then the price in the point $C$ requires only at least $\hat{x}_c$ and $\hat{y}_c$, in which $\hat{x}_c \leq x_c$ and $\hat{y}_c \leq y_c$.
+However, in Uniswap V3, if a liquidity provider decides to provide liquidity only in the price range $[p_a, p_b]$, then the price in the point $C$ requires only at least $\hat{x}_c$ and $\hat{y}_c$, in which $\hat{x}_c \leq x_c$ and $\hat{y}_c \leq y_c$.
 Therefore, if liquidity providers choose price ranges wisely, capital efficiency is improved compared to Uniswap V2.
-The downside is that, given a specific bounded Uniswap V3 position, not all prices can be represented, as can be noticed by analysing equation \ref{equation:virtual_amounts}, in which since virtual and real amounts are non negative, it is not possible to represent virtual amounts $x_c$ smaller than $x_a$ nor $y_c$ smaller than $y_b$, meaning that possible prices lies in $[p_a, p_b]$.
+The downside is that, given a specific bounded Uniswap V3 position, not all prices can be represented, as can be noticed by analysing equation \ref{equation:virtual_amounts}, in which since virtual and real amounts are non negative, it is not possible to represent virtual amounts $x_c$ smaller than $x_a$ nor $y_c$ smaller than $y_b$, meaning that possible prices lies only in $[p_a, p_b]$.
 
 Different from Uniswap V2, Uniswap V3 doesn't directly track tokens amounts in the pool in its state, it tracks $L$ and $\sqrt{p}$ instead.
 The reason behind this decision was convenience due to only one of those two values changing in an operation, i.e., $L$ changes when a liquidity provider adds/removes liquidity, and $\sqrt{p}$ changes when traders exchange tokens.
@@ -214,7 +214,7 @@ Since $\sqrt{p}$, $\sqrt{p_a}$, $\sqrt{p_b}$ remains constant during a liquidity
 
 It is important to note that those equations only hold for $p \in [p_a, p_b]$, if this is not true, equations \ref{equation:virtual_amounts} are not valid.
 
-Then, with those equations in hands it is possible to update the $L$ value after a liquidity provider operation.
+Then, with those equations in hands it is possible to update $L$ after a liquidity provider operation.
 
 \subsection{Handling Multiple Positions Simultaneously}
 
@@ -227,18 +227,18 @@ A liquidity of a tick is the aggregated liquidity of all positions that include 
 \subsection{Zero-Sum Game}
 
 Managing an Uniswap V3 position can be complex.
-A liquidity provider must define which price range to use, and also needs to be worried if this price range will include the pool's price variations through time.
+A liquidity provider must define which tick range to use, and also needs to be worried if this tick range will include the pool's price variations through time.
 Both aspects will influence the amount of fees collected by the liquidity provider.
 Then several protocols, such as Arrakis and Popsicle, arised to try to commoditize this management procedure, by providing an active Uniswap V3 position management service.
 
-Today those active managers periodically update Uniswap V3 positions price ranges in order to try to optimize fee collection to their users.
-And they also bundle all its users in a single Uniswap V3 position, which can save some gas fees, since updating a single price range for all users is cheaper than updating a single position for each user.
+Today those active managers periodically update Uniswap V3 positions tick ranges in order to try to optimize fee collection to their users.
+And they also bundle all its users in a single Uniswap V3 position, which can save some gas fees, since updating a single position for all users is cheaper than updating a single position for each user.
 
-If we suppose a scenario in which the volume of trades is constant, which means that the amount of fees collected by trades is constant, if there is a single active manager that holds all the TVL in a V3 pool, then the fees earned by the liquidity providers will be the same as in a V2 pool, the price range wouldn't matter in the amount of fees earned.
+If we suppose a scenario in which the volume of trades is constant, which means that the amount of fees collected by trades is constant, if there is a single active manager that holds all the TVL in a V3 pool, then the fees earned by the liquidity providers will be the same as in a V2 pool, the tick range wouldn't matter in the amount of fees earned.
 In the perspective of liquidity providers, who are interested in earning more fees, competition is interesting, it seems a zero-sum game, to some liquidity providers earn more fees others have to earn less.
 Also, considering this, a liquidity provider doesn't want that other liquidity providers join the same active manager that he uses, since in this case there will be one less loser that he would benefit from.
 But there is a trade-off here, due to more users in a active manager implicating in less gas cost overhead per user.
-It seems that Uniswap V3 was not only a strategy to try to improve "capital eficiency", to try to get more stable prices compared to V2, but also a strategy to create a gambling game, to keep liquidity providers interested in Uniswap, stimulating them to use different gambling strategies to try to earn more.
+It seems that Uniswap V3 was not only a strategy to try to improve capital efficiency, to try to get more stable prices compared to V2, but also a strategy to create a gambling game, to keep liquidity providers interested in Uniswap, stimulating them to use different gambling strategies to try to earn more.
 
 However it is possible to argue that concentrated liquidity increases the supply of liquidity providers, due to the gambling incentives, and also increases the demand for trades due to the improved price stability, which also increases the demand for liquidity providers, creating a feedback loop incentive.
 
