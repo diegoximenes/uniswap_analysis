@@ -33,21 +33,21 @@ In general, fees gathered from traders are distributed to liquidity providers, w
 
 Also, Uniswap defines the concept of a pool, which is a Constant Product Market Maker specific for a pair of tokens, e.g., USDC/DAI, in which liquidity providers and traders operate with only this pair of tokens.
 
-Each kind of those operations have its own invariances considering the state of a pool.
+Each kind of those operations have its own invariants considering the state of a pool.
 
-\subsection{Traders Operations Invariance}
-\label{section:traders_invariance}
+\subsection{Traders Operations Invariant}
+\label{section:traders_invariant}
 
-Considering a pool of a pair of tokens $token_x$ and $token_y$, and that in the current pool's state the amount of $token_x$ is $x$, and the amount of $token_y$ is $y$, and $k$ as a constant, a Constant Product Market Maker defines the following invariance for traders operations:
+Considering a pool of a pair of tokens $token_x$ and $token_y$, and that in the current pool's state the amount of $token_x$ is $x$, and the amount of $token_y$ is $y$, and $k$ as a constant, a Constant Product Market Maker defines the following invariant for traders operations:
 
 \begin{equation}
     \label{equation:constant_product}
     xy=k
 \end{equation}
 
-That invariance gives the name of the kind of the market maker.
+That invariant gives the name of the kind of the market maker.
 
-This invariance means that, if a trader wants to get a certain amount $\Delta_x$ of a $token_x$ then he must give an amount $\Delta_y$ of $token_y$ to the pool that satisfies the following condition:
+This invariant means that, if a trader wants to get a certain amount $\Delta_x$ of a $token_x$ then he must give an amount $\Delta_y$ of $token_y$ to the pool that satisfies the following condition:
 
 \begin{equation}
     \label{equation:constant_product_2}
@@ -57,10 +57,10 @@ This invariance means that, if a trader wants to get a certain amount $\Delta_x$
     \end{split}
 \end{equation}
 
-\subsection{Liquidity Providers Operations Invariance}
-\label{section:liquidity_providers_invariance}
+\subsection{Liquidity Providers Operations Invariant}
+\label{section:liquidity_providers_invariant}
 
-Liquidity providers invariance is related to the pool's price, so it is important to first define of what this price is.
+Liquidity providers invariant is related to the pool's price, so it is important to first define of what this price is.
 
 A price is a property of a trade, so if a trader gave $\Delta_y$ of $token_y$ to the pool and received back $\Delta_x$ of $token_x$, then the price of $token_x$ in relation to $token_y$ in this trade can be defined as:
 
@@ -95,9 +95,9 @@ Then, considering that $x$ and $y$ moves in opposite directions, i.e., when $x$ 
     p=-\frac{dy}{dx}=\frac{k}{x^2}=\frac{y}{x}
 \end{equation}
 
-The liquidity providers operations invariance relies on the fact that the price of a pool shouldn't vary when liquidity is added to or removed from a pool.
+The liquidity providers operations invariant relies on the fact that the price of a pool shouldn't vary when liquidity is added to or removed from a pool.
 The price should only fluctuate due to the supply and demand influenced by traders.
-Therefore, if a liquidity provider decides to add $\Delta_x$ and $\Delta_y$ to the pool, the following invariance must be satisfied:
+Therefore, if a liquidity provider decides to add $\Delta_x$ and $\Delta_y$ to the pool, the following invariant must be satisfied:
 
 \begin{equation}
     p=\frac{y}{x}=\frac{y+\Delta_y}{x+\Delta_x}
@@ -108,7 +108,7 @@ And in case a liquidity provider decides to remove $\Delta_x$ and $\Delta_y$ of 
     p=\frac{y}{x}=\frac{y-\Delta_y}{x-\Delta_x}
 \end{equation}
 
-It is interesting to note that when liquidity is added or removed then $k$ varies, so the name Constant Product Market Maker is only a reference to traders operations invariance.
+It is interesting to note that when liquidity is added or removed then $k$ varies, so the name Constant Product Market Maker is only a reference to traders operations invariant.
 
 \section{Concentrated liquidity in a Constant Product Market Maker}
 
@@ -156,9 +156,9 @@ The reason behind this decision was convenience due to only one of those two val
 According to Uniswap V3 white paper this can also avoid some rounding issues that could arise due to tracking virtual amounts.
 However, this complicates a little the understanding on how to calculate some properties related to a pool's state.
 
-\subsection{Liquidity Providers Operations Invariance}
+\subsection{Liquidity Providers Operations Invariant}
 
-The invariance is the same as described in Section \ref{section:liquidity_providers_invariance}, however due to the way Uniswap V3 keeps states, a pool's state update in a operation is a little bit different.
+The invariant is the same as described in Section \ref{section:liquidity_providers_invariant}, however due to the way Uniswap V3 keeps states, a pool's state update in a operation is a little bit different.
 
 First, it is possible to observe that current virtual amounts can be expressed as functions of $L$ and $\sqrt{p}$:
 
